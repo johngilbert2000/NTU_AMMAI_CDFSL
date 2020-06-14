@@ -35,10 +35,10 @@ class ArcFaceTrain(nn.Module):
 
     def forward_loss(self, x, y):
         y = Variable(y.cuda())
-        print("y:", y)
-        print("y.data",y.data)
+#         print("y:", y)
+#         print("y.data",y.data)
         feat = self.forward(x)
-        print("Feature shape:", feat.shape)
+#         print("Feature shape:", feat.shape)
         cosine = F.linear(F.normalize(feat), F.normalize(self.weight))
         sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
         phi = cosine * self.cos_m - sine * self.sin_m
@@ -50,14 +50,14 @@ class ArcFaceTrain(nn.Module):
         one_hot.scatter_(1, y.unsqueeze(1), 1)
         scores = (one_hot * phi) + ((1.0 - one_hot) * cosine)
         scores *= self.s
-        print("Score shape:", scores.shape)
-        print("scores", scores)
+#         print("Score shape:", scores.shape)
+#         print("scores", scores)
 
         _, predicted = torch.max(scores.data, 1)
-        print("predicted:", predicted)
+#         print("predicted:", predicted)
         correct = predicted.eq(y.data).cpu().sum()
         accuracy = predicted.eq(y.data).cpu().type(torch.FloatTensor).mean()
-        print("accuracy", accuracy)
+#         print("accuracy", accuracy)
         self.top1.update(correct.item()*100 / (y.size(0)+0.0), y.size(0))  
 
         return self.loss_fn(scores, y )
@@ -73,7 +73,7 @@ class ArcFaceTrain(nn.Module):
 
             avg_loss = avg_loss+loss.item()
             if i % print_freq==0:
-                #print(optimizer.state_dict()['param_groups'][0]['lr'])
+                print(optimizer.state_dict()['param_groups'][0]['lr'])
                 print('Epoch {:d} | Batch {:d}/{:d} | Loss {:f} | Top1 Val {:f} | Top1 Avg {:f}'.format(epoch, i, len(train_loader), avg_loss/float(i+1), self.top1.val, self.top1.avg))
                      
     def test_loop(self, val_loader):
