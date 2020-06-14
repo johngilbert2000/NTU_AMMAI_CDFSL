@@ -2,6 +2,10 @@
 
 The source code of NTU-AMMAI-CDFSL.
 
+### 06/04 Update
+
+The RAM usage issue: if your computer doesn't have enough ram for this project, you can first create a json file which contain all the image infomation (name, label etc.) and load the json file instead of all the images. If there is any further question, please let us know.
+
 ### Datasets
    * mini-ImageNet: https://drive.google.com/file/d/1zGGCKzspL0GSZhiDEp8rpVnB4i-jL2k_/view?usp=sharing
    * EuroSAT: https://drive.google.com/file/d/1DUj510w7726Iga34gmmhLA4meVYULrBe/view?usp=sharing
@@ -56,7 +60,7 @@ The source code of NTU-AMMAI-CDFSL.
 
       • --train_aug: add this if you train the model with this option.
 
-      • --freeze_backbone: add this for inferring directly. (Do not add this if you want to fine-tune your model, you can only fine-tune models in task 2.)
+      • --freeze_backbone: add this for inferring directly. (Do not add this if you want to fine-tune your model, you should only fine-tune models in task 2.)
 
       There are two meta-test files:
 
@@ -75,7 +79,7 @@ The source code of NTU-AMMAI-CDFSL.
 
       * **meta_test_few_shot_models.py**:
       
-        This method will apply the pseudo query set to the few-shot model you want to fine-tune with. (if add --freeze_backbone)
+        This method will apply the pseudo query set to the few-shot model you want to fine-tune with. 
 
         The available method list: [protonet]
 
@@ -130,6 +134,7 @@ For EuroSAT and ISIC, the result w/o and w/ fine-tuning are the first and second
       ```
 
       - Hint: large margin methods or feature generalization methods may be helpful to solve the problem.
+      
 ### Contact Information
    H.T. Su (d06944009@ntu.edu.tw)
 
