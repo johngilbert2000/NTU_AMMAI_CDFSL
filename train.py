@@ -13,6 +13,7 @@ import backbone
 
 from methods.baselinetrain import BaselineTrain
 from methods.protonet import ProtoNet
+from methods.ArcFace import ArcFaceTrain
 
 from io_utils import model_dict, parse_args, get_resume_file  
 from datasets import miniImageNet_few_shot
@@ -80,6 +81,25 @@ if __name__=='__main__':
 
         if params.method == 'protonet':
             model           = ProtoNet( model_dict[params.model], **train_few_shot_params )
+
+    elif params.method in ['Triplet']:
+        pass
+    elif params.method in ['ArcFace', 'ArcFace-pretrain']:
+        if params.dataset == "miniImageNet":
+        
+            datamgr = miniImageNet_few_shot.SimpleDataManager(image_size, batch_size = 16)
+            base_loader = datamgr.get_data_loader(aug = params.train_aug )
+            val_loader  = None
+        else:
+           raise ValueError('Unknown dataset')
+
+        pretrain = 'pretrain' in params.method
+        if pretrain:
+            print("INFO: pretraining with softmax only")
+        else:
+            print("INFO: training from scratch with arcface loss")
+        model           = ArcFaceTrain( model_dict[params.model], params.num_classes, pretrain=pretrain)
+
     else:
        raise ValueError('Unknown method')
 
@@ -90,7 +110,7 @@ if __name__=='__main__':
     if params.train_aug:
         params.checkpoint_dir += '_aug'
 
-    if not params.method  in ['baseline', 'baseline++']: 
+    if not params.method  in ['baseline', 'baseline++', 'ArcFace']: 
         params.checkpoint_dir += '_%dway_%dshot' %( params.train_n_way, params.n_shot)
 
     if not os.path.isdir(params.checkpoint_dir):
@@ -99,4 +119,5 @@ if __name__=='__main__':
     start_epoch = params.start_epoch
     stop_epoch = params.stop_epoch
 
+    print("INFO: Start training")
     model = train(base_loader, val_loader, model, optimization, start_epoch, stop_epoch, params)

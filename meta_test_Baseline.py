@@ -51,7 +51,7 @@ def meta_test(novel_loader, n_query = 15, pretrained_dataset='miniImageNet', fre
         params.save_iter = -1
         if params.save_iter != -1:
             modelfile   = get_assigned_file(checkpoint_dir, params.save_iter)
-        elif params.method in ['baseline', 'baseline++'] :
+        elif params.method in ['baseline', 'baseline++', 'ArcFace', 'ArcFace-pretrain'] :
             modelfile   = get_resume_file(checkpoint_dir)
         else:
             modelfile   = get_best_file(checkpoint_dir)
