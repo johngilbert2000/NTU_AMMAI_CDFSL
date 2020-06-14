@@ -84,7 +84,7 @@ if __name__=='__main__':
 
     elif params.method in ['Triplet']:
         pass
-    elif params.method in ['arcface']:
+    elif params.method in ['ArcFace', 'ArcFace-pretrain']:
         if params.dataset == "miniImageNet":
         
             datamgr = miniImageNet_few_shot.SimpleDataManager(image_size, batch_size = 16)
@@ -93,7 +93,12 @@ if __name__=='__main__':
         else:
            raise ValueError('Unknown dataset')
 
-        model           = ArcFaceTrain( model_dict[params.model], params.num_classes)
+        pretrain = 'pretrain' in params.method
+        if pretrain:
+            print("INFO: pretraining with softmax only")
+        else:
+            print("INFO: training from scratch with arcface loss")
+        model           = ArcFaceTrain( model_dict[params.model], params.num_classes, pretrain=pretrain)
 
     else:
        raise ValueError('Unknown method')
