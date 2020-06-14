@@ -33,13 +33,14 @@ class MetaTemplate(nn.Module):
     def parse_feature(self,x,is_feature):
         x    = Variable(x.to(self.device))
         if is_feature:
-            z_all = x
+            z_all = x # Size: [5, 21, 3, 224, 224]
         else:
-            x           = x.contiguous().view( self.n_way * (self.n_support + self.n_query), *x.size()[2:]) 
-            z_all       = self.feature.forward(x)
-            z_all       = z_all.view( self.n_way, self.n_support + self.n_query, -1)
-        z_support   = z_all[:, :self.n_support]
-        z_query     = z_all[:, self.n_support:]
+            x           = x.contiguous().view( self.n_way * (self.n_support + self.n_query), *x.size()[2:]) # [105,3,224,224]
+            z_all       = self.feature.forward(x) # Size: [105, 512]
+            z_all       = z_all.view( self.n_way, self.n_support + self.n_query, -1) # Size: [5, 21, 512]
+            
+        z_support   = z_all[:, :self.n_support] # Size: [5, 5, 512]
+        z_query     = z_all[:, self.n_support:] # Size: [5, 16, 512]
 
         return z_support, z_query
 
