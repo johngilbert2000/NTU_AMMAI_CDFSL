@@ -82,9 +82,9 @@ if __name__=='__main__':
         if params.method == 'protonet':
             model           = ProtoNet( model_dict[params.model], **train_few_shot_params )
 
-    elif params.method in ['Triplet']:
+    elif params.method.lower() in ['triplet']:
         pass
-    elif params.method in ['ArcFace', 'ArcFace-pretrain']:
+    elif params.method.lower() in ['arcface', 'arcface-pretrain']:
         if params.dataset == "miniImageNet":
         
             datamgr = miniImageNet_few_shot.SimpleDataManager(image_size, batch_size = 16)
