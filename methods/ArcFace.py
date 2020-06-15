@@ -9,7 +9,7 @@ import numpy as np
 import torch.nn.functional as F
 
 class ArcFaceTrain(nn.Module):
-    def __init__(self, model_func, num_class, s=32.0, m=0.50, easy_margin=False, pretrain=False):
+    def __init__(self, model_func, num_class, s=30.0, m=0.50, easy_margin=False, pretrain=False):
         super(ArcFaceTrain, self).__init__()
         self.feature    = model_func()
         self.s = s
@@ -24,12 +24,20 @@ class ArcFaceTrain(nn.Module):
 
         self.weight = nn.Parameter(torch.FloatTensor(num_class, self.feature.final_feat_dim))
         nn.init.xavier_uniform_(self.weight)
+        self.classifier = nn.Linear(self.feature.final_feat_dim, num_class)
+        self.classifier.bias.data.fill_(0)
 
         self.num_class = num_class
         self.loss_fn = nn.CrossEntropyLoss()
         self.top1 = utils.AverageMeter()
 
     def forward(self,x):
+        x    = Variable(x.cuda())
+        out  = self.feature.forward(x)
+        scores  = self.classifier.forward(out)
+        return scores
+
+    def forward_feature(self,x):
         x     = Variable(x.cuda())
         feat  = self.feature.forward(x)
         return feat
@@ -37,7 +45,7 @@ class ArcFaceTrain(nn.Module):
     def forward_arcface_loss(self, x, y):
         y = Variable(y.cuda())
 
-        feat = self.forward(x)
+        feat = self.forward_feature(x)
         cosine = F.linear(F.normalize(feat), F.normalize(self.weight))
         sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
         phi = cosine * self.cos_m - sine * self.sin_m
