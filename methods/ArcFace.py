@@ -9,7 +9,7 @@ import numpy as np
 import torch.nn.functional as F
 
 class ArcFaceTrain(nn.Module):
-    def __init__(self, model_func, num_class, s=30.0, m=0.50, easy_margin=False, pretrain=False):
+    def __init__(self, model_func, num_class, s=4.0, m=0.50, easy_margin=False, pretrain=False):
         super(ArcFaceTrain, self).__init__()
         self.feature    = model_func()
         self.s = s

@@ -32,13 +32,13 @@ class BaselineTrain(nn.Module):
     def forward_loss(self, x, y):
         y = Variable(y.cuda())
 
-        print("y", y)
+#         print("y", y)
         scores = self.forward(x)
-        print("scores", scores)
+#         print("scores", scores)
         _, predicted = torch.max(scores.data, 1)
-        print("predicted", predicted)
+#         print("predicted", predicted)
         correct = predicted.eq(y.data).cpu().sum()
-        print("correct", correct)
+#         print("correct", correct)
         self.top1.update(correct.item()*100 / (y.size(0)+0.0), y.size(0))  
 
         return self.loss_fn(scores, y )
