@@ -119,5 +119,5 @@ if __name__=='__main__':
     start_epoch = params.start_epoch
     stop_epoch = params.stop_epoch
 
-    print("INFO: Start training")
+    print("INFO: Start training, EPOCH %d-%d" % (start_epoch, stop_epoch))
     model = train(base_loader, val_loader, model, optimization, start_epoch, stop_epoch, params)
