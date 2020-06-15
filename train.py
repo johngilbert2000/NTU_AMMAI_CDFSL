@@ -13,14 +13,15 @@ import backbone
 
 from methods.baselinetrain import BaselineTrain
 from methods.protonet import ProtoNet
-from methods.ArcFace import ArcFaceTrain
+from methods.ArcFace import * # ArcFaceTrain, CosFaceTrain, SphereFaceTrain
+from methods.protomargin import ProtoMarginTrain
 
 from io_utils import model_dict, parse_args, get_resume_file  
 from datasets import miniImageNet_few_shot
 
 def train(base_loader, val_loader, model, optimization, start_epoch, stop_epoch, params):    
     if optimization == 'Adam':
-        optimizer = torch.optim.Adam(model.parameters())
+        optimizer = torch.optim.Adam(model.parameters(), weight_decay=1e-3)
     else:
        raise ValueError('Unknown optimization, please define by yourself')     
 
@@ -52,7 +53,10 @@ if __name__=='__main__':
     image_size = 224
     optimization = 'Adam'
 
-    if params.method in ['baseline'] :
+    if params.method in ['baseline', 
+                         'ArcFace', 'ArcFace-pretrain', 
+                         'CosFace', 'CosFace-pretrain', 
+                         'SphereFace', 'SphereFace-pretrain'] :
 
         if params.dataset == "miniImageNet":
         
@@ -62,9 +66,22 @@ if __name__=='__main__':
         else:
            raise ValueError('Unknown dataset')
 
-        model           = BaselineTrain( model_dict[params.model], params.num_classes)
+        if params.method == 'baseline':
+            model           = BaselineTrain( model_dict[params.model], params.num_classes)
+        else:
+            pretrain = 'pretrain' in params.method
+            if pretrain:
+                print("INFO: pretraining with softmax only")
+            else:
+                print("INFO: training from scratch with arcface loss")
+            if 'ArcFace'in params.method:
+                model = ArcFaceTrain( model_dict[params.model], params.num_classes, pretrain=pretrain)
+            if 'CosFace'in params.method:
+                model = CosFaceTrain( model_dict[params.model], params.num_classes, pretrain=pretrain)
+            if 'SphereFace'in params.method:
+                model = SphereFaceTrain( model_dict[params.model], params.num_classes, pretrain=pretrain)
 
-    elif params.method in ['protonet']:
+    elif params.method in ['protonet', 'protomargin']:
         n_query = max(1, int(16* params.test_n_way/params.train_n_way)) #if test_n_way is smaller than train_n_way, reduce n_query to keep batch size small
         train_few_shot_params    = dict(n_way = params.train_n_way, n_support = params.n_shot) 
         test_few_shot_params     = dict(n_way = params.test_n_way, n_support = params.n_shot) 
@@ -81,24 +98,8 @@ if __name__=='__main__':
 
         if params.method == 'protonet':
             model           = ProtoNet( model_dict[params.model], **train_few_shot_params )
-
-    elif params.method.lower() in ['triplet']:
-        pass
-    elif params.method.lower() in ['arcface', 'arcface-pretrain']:
-        if params.dataset == "miniImageNet":
-        
-            datamgr = miniImageNet_few_shot.SimpleDataManager(image_size, batch_size = 16)
-            base_loader = datamgr.get_data_loader(aug = params.train_aug )
-            val_loader  = None
-        else:
-           raise ValueError('Unknown dataset')
-
-        pretrain = 'pretrain' in params.method
-        if pretrain:
-            print("INFO: pretraining with softmax only")
-        else:
-            print("INFO: training from scratch with arcface loss")
-        model           = ArcFaceTrain( model_dict[params.model], params.num_classes, pretrain=pretrain)
+        if params.method == 'protomargin':
+            model           = ProtoMarginTrain( model_dict[params.model], **train_few_shot_params )
 
     else:
        raise ValueError('Unknown method')
@@ -119,5 +120,5 @@ if __name__=='__main__':
     start_epoch = params.start_epoch
     stop_epoch = params.stop_epoch
 
-    print("INFO: Start training")
+    print("INFO: Start training, EPOCH %d-%d" % (start_epoch, stop_epoch))
     model = train(base_loader, val_loader, model, optimization, start_epoch, stop_epoch, params)
