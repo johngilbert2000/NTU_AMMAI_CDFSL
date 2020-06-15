@@ -111,7 +111,10 @@ if __name__=='__main__':
     if params.train_aug:
         params.checkpoint_dir += '_aug'
 
-    if not params.method  in ['baseline', 'baseline++', 'ArcFace']: 
+    if not params.method  in ['baseline', 
+                              'ArcFace', 'ArcFace-pretrain', 
+                              'CosFace', 'CosFace-pretrain', 
+                              'SphereFace', 'SphereFace-pretrain']: 
         params.checkpoint_dir += '_%dway_%dshot' %( params.train_n_way, params.n_shot)
 
     if not os.path.isdir(params.checkpoint_dir):

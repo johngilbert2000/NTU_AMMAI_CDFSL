@@ -218,8 +218,6 @@ class SphereFaceTrain(nn.Module):
 
     def forward_sphereface_loss(self, x, y):
         y = Variable(y.cuda())
-        print("y:", y.shape)
-        print(y)
 
         feat = self.forward_feature(x)
 
@@ -241,12 +239,7 @@ class SphereFaceTrain(nn.Module):
         scores = (one_hot * (phi_theta - cos_theta) / (1 + self.lamb)) + cos_theta
         scores *= NormOfFeature.view(-1, 1)
 
-        print("scores[0][:64]", scores[0][:64])
-        print("score[0][64:]", scores[0][64:])
-
         _, predicted = torch.max(scores.data, 1)
-        print("predicted:", predicted.shape)
-        print(predicted)
         correct = predicted.eq(y.data).cpu().sum()
         self.top1.update(correct.item()*100 / (y.size(0)+0.0), y.size(0))  
 
