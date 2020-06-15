@@ -9,7 +9,7 @@ import numpy as np
 import torch.nn.functional as F
 
 class ArcFaceTrain(nn.Module):
-    def __init__(self, model_func, num_class, s=4.0, m=0.50, easy_margin=False, pretrain=False):
+    def __init__(self, model_func, num_class, s=1.0, m=0.50, easy_margin=False, pretrain=False):
         super(ArcFaceTrain, self).__init__()
         self.feature    = model_func()
         self.s = s
@@ -94,3 +94,6 @@ class ArcFaceTrain(nn.Module):
                      
     def test_loop(self, val_loader):
         return -1 #no validation, just save model during iteration
+
+# python ./train.py --dataset miniImageNet --model ResNet10  --method ArcFace --train_aug
+# python ./train.py --dataset miniImageNet --model ResNet10  --method ArcFace-pretrain --train_aug
