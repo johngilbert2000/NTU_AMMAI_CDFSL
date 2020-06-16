@@ -14,6 +14,7 @@ import configs
 import backbone
 from data.datamgr import SimpleDataManager, SetDataManager
 from methods.protonet import ProtoNet
+from methods.protomargin import ProtoMarginTrain
 
 from io_utils import model_dict, parse_args, get_resume_file, get_best_file, get_assigned_file 
 from utils import *
@@ -34,6 +35,8 @@ def meta_test(novel_loader, n_query = 15, pretrained_dataset='miniImageNet', fre
         # load pretrained model on miniImageNet
         if params.method == 'protonet':
             pretrained_model = ProtoNet(model_dict[params.model], n_way = n_way, n_support = n_support)
+        if params.method == 'protomargin':
+            pretrained_model = ProtoMarginTrain(model_dict[params.model], n_way = n_way, n_support = n_support)
 
 
         checkpoint_dir = '%s/checkpoints/%s/%s_%s' %(configs.save_dir, pretrained_dataset, params.model, params.method)
