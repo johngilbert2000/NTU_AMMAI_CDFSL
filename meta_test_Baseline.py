@@ -47,6 +47,9 @@ def meta_test(novel_loader, n_query = 15, pretrained_dataset='miniImageNet', fre
         checkpoint_dir = '%s/checkpoints/%s/%s_%s' %(configs.save_dir, pretrained_dataset, params.model, params.method)
         if params.train_aug:
             checkpoint_dir += '_aug'
+            
+        if not os.path.isdir(checkpoint_dir):
+            checkpoint_dir += '_5way_5shot'
 
         params.save_iter = -1
         if params.save_iter != -1:
@@ -54,7 +57,7 @@ def meta_test(novel_loader, n_query = 15, pretrained_dataset='miniImageNet', fre
         elif params.method in ['baseline', 'baseline++', 
                                'ArcFace', 'ArcFace-pretrain',
                                'CosFace', 'CosFace-pretrain', 
-                               'SphereFace', 'SphereFace-pretrain'] :
+                               'SphereFace', 'SphereFace-pretrain', 'FocalBase'] :
             modelfile   = get_resume_file(checkpoint_dir)
         else:
             modelfile   = get_best_file(checkpoint_dir)
